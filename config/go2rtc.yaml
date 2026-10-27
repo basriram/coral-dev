@@ -1,0 +1,6 @@
+api:
+  listen: ":1984"
+rtsp:
+  listen: ":8554"
+streams:
+  coral: "exec:gst-launch-1.0 -q v4l2src device=/dev/video0 ! video/x-raw,format=UYVY,width=1280,height=960,framerate=15/1 ! videoconvert ! jpegenc ! multipartmux boundary=frame ! filesink location=/dev/stdout"

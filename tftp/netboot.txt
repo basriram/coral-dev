@@ -1,0 +1,7 @@
+# Replace <tftp-host> with the TFTP server IP before running mkimage.
+echo Netboot: loading 6.12 kernel and DTB via TFTP
+setenv serverip <tftp-host>
+setenv bootargs console=ttymxc0,115200 root=/dev/mmcblk1p2 rootfstype=ext4 rw rootwait net.ifnames=0 pci=pcie_bus_perf
+tftp ${loadaddr} Image
+tftp ${fdt_addr} imx8mq-phanbell.dtb
+booti ${loadaddr} - ${fdt_addr}

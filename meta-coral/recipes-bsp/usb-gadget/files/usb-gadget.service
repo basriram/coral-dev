@@ -1,0 +1,14 @@
+[Unit]
+Description=USB Gadget
+After=NetworkManager.service
+Before=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/sbin/modprobe libcomposite
+ExecStart=/usr/bin/usb-gadget-start.sh
+ExecStop=/usr/bin/usb-gadget-stop.sh
+
+[Install]
+WantedBy=multi-user.target

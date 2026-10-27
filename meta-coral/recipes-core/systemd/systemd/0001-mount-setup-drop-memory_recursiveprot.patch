@@ -1,0 +1,14 @@
+--- a/src/shared/mount-setup.c
++++ b/src/shared/mount-setup.c
+@@ -83,4 +83,4 @@
+         /* These options shall be kept in sync with those in mount_table below. */
+-        if (!strprepend_with_separator(&opts, ",", "nsdelegate,memory_recursiveprot"))
++        if (!strprepend_with_separator(&opts, ",", "nsdelegate"))
+                 return log_oom();
+ 
+@@ -202,4 +202,4 @@
+                 .type = "cgroup2",
+-                .options = "nsdelegate,memory_recursiveprot",
++                .options = "nsdelegate",
+                 .options_fn = cgroupfs_mount_options,
+                 .flags = MS_NOSUID|MS_NOEXEC|MS_NODEV,

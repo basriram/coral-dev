@@ -1,0 +1,121 @@
+--- a/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mq-phanbell.dts
+@@ -46,6 +46,37 @@
+ 		pinctrl-0 = <&pinctrl_gpio_fan>;
+ 		status = "okay";
+ 	};
++
++	cam_clk: camera-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <24000000>;
++		clock-output-names = "cam_clk";
++	};
++
++	reg_cam_1v8: regulator-cam-1v8 {
++		compatible = "regulator-fixed";
++		regulator-name = "CAM_1V8";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++	};
++
++	reg_cam_2v8: regulator-cam-2v8 {
++		compatible = "regulator-fixed";
++		regulator-name = "CAM_2V8";
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		regulator-always-on;
++	};
++
++	reg_cam_1v5: regulator-cam-1v5 {
++		compatible = "regulator-fixed";
++		regulator-name = "CAM_1V5";
++		regulator-min-microvolt = <1500000>;
++		regulator-max-microvolt = <1500000>;
++		regulator-always-on;
++	};
+ };
+ 
+ &A53_0 {
+@@ -259,6 +290,59 @@
+ 	};
+ };
+ 
++&i2c2 {
++	clock-frequency = <400000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c2>;
++	status = "okay";
++
++	camera@3c {
++		compatible = "ovti,ov5645";
++		reg = <0x3c>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_csi1>;
++
++		clocks = <&cam_clk>;
++		clock-names = "xclk";
++		clock-frequency = <24000000>;
++
++		enable-gpios = <&gpio3 8 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
++
++		vdda-supply = <&reg_cam_2v8>;
++		vdddo-supply = <&reg_cam_1v8>;
++		vddd-supply = <&reg_cam_1v5>;
++
++		port {
++			ov5645_ep: endpoint {
++				remote-endpoint = <&mipi_csi1_in>;
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++			};
++		};
++	};
++};
++
++&csi1 {
++	status = "okay";
++};
++
++&mipi_csi1 {
++	status = "okay";
++
++	ports {
++		port@0 {
++			reg = <0>;
++
++			mipi_csi1_in: endpoint {
++				remote-endpoint = <&ov5645_ep>;
++				data-lanes = <1 2>;
++			};
++		};
++	};
++};
++
+ &fec1 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_fec1>;
+@@ -366,6 +450,20 @@
+ 		>;
+ 	};
+ 
++	pinctrl_i2c2: i2c2grp {
++		fsl,pins = <
++			MX8MQ_IOMUXC_I2C2_SCL_I2C2_SCL			0x4000007f
++			MX8MQ_IOMUXC_I2C2_SDA_I2C2_SDA			0x4000007f
++		>;
++	};
++
++	pinctrl_csi1: csi1grp {
++		fsl,pins = <
++			MX8MQ_IOMUXC_NAND_DATA02_GPIO3_IO8		0x19 /* PWDN */
++			MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12		0x19 /* RESETB */
++		>;
++	};
++
+ 	pinctrl_pmic: pmicirqgrp {
+ 		fsl,pins = <
+ 			MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3	0x41
